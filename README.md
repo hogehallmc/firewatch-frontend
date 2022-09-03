@@ -1,0 +1,3 @@
+# Firewatch Frontend stuffs
+
+yep

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        color: white;
+      }
+      h1.entry-title {
+        margin-top: 40px;
+      }
+      p.alarmHistory {
+        white-space: pre-wrap;
+      }
+      .timerContainer {
+        font-size: 200%;
+        width: 100%;
+        display: inline-grid;
+        grid-template-columns: 25% 25% 25% 25%;
+        max-width: 400px;
+      }
+      .timerContainer > * {
+        justify-self: center;
+      }
+      .timerContainer > div:nth-of-type(1n+5) {
+        font-size: 40%;
+      }
+      .imgTimer {
+        font-size: 300%;
+        position: absolute;
+        height: 60%;
+        width: 95%;
+        top: 20%;
+        left: 2.5%;
+        margin: auto;
+      }
+      .imgDimmer {
+        position: relative;
+        background-color: rgba(0,0,0,0.6);
+        height: 100%;
+        width: 100%;
+        border-radius: inherit;
+      }
+      .timerBackground {
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 225px;
+        max-width: 450px;
+        border-radius: 14px;
+        margin-bottom: 20px;
+      }
+      #discordButton {
+        background-color:#5865F2;
+        width:100%;
+      }
+      #discordButton:hover {
+        background-color: #5e5e5e;
+      }
+    </style>
+
+    <script>
+      async function grabAlarmData() {
+        let fetchHeaders = new Headers();
+        fetchHeaders.append('pragma', 'no-cache');
+        fetchHeaders.append('cache-control', 'no-cache');
+        var fetchInit = {
+          method: 'GET',
+          headers: fetchHeaders,
+        };
+        let alarmData = await fetch("https://pritchardalarms.com/alarmdata/data.json", fetchInit)
+          .then(res => res.text())
+          .then(rep => { return rep; })
+
+        return JSON.parse(alarmData);
+      };
+
+      async function init() {
+        let alarmData = await grabAlarmData();
+
+        // example code (when was the last time data was pulled from the spreadsheet?)
+        let lastDataPullTime = new Date(alarmData.lastUpdate);
+        console.log("Last data pull was on " + lastDataPullTime.toDateString() + " at " + lastDataPullTime.toLocaleTimeString() + ".");
+        console.log(alarmData);
+
+      }
+
+      init();
+
+    </script>
+  </head>
+  <body>
+    <div id="Hoge">
+      <div class="timerBackground" style="background-image: url(https://pritchardalarms.com/wp-content/uploads/2021/07/hoge.jpg)">
+      <div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div>
+    </div>
+
+    <div id="Slusher">
+      <div class="timerBackground" style="background-image: url(https://pritchardalarms.com/wp-content/uploads/2021/07/slusher.jpg)">
+        <div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div>
+    </div>
+
+    <div id="CID">
+      <div class="timerBackground" style="background-image: url(https://pritchardalarms.com/wp-content/uploads/2021/08/image.jpg)">
+      <div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div>
+    </div>
+  </body>
+</html>
