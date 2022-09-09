@@ -5,6 +5,13 @@
       body {
         color: white;
       }
+      h2 {
+        color: black;
+      }
+      details {
+        color: black;
+        padding-bottom: 5%;
+      }
       h1.entry-title {
         margin-top: 40px;
       }
@@ -75,12 +82,51 @@
       };
 
       async function init() {
+
         let alarmData = await grabAlarmData();
 
         // example code (when was the last time data was pulled from the spreadsheet?)
         let lastDataPullTime = new Date(alarmData.lastUpdate);
         console.log("Last data pull was on " + lastDataPullTime.toDateString() + " at " + lastDataPullTime.toLocaleTimeString() + ".");
         console.log(alarmData);
+
+        let hallsArray = Object.entries(alarmData.halls);
+        console.log(hallsArray)
+
+        setInterval( function(){
+
+          var currentDate = new Date();
+
+          for(let i = 0; i < hallsArray.length; i++){
+            //for(let i = 0; i < halls.length; i++){ //this commented code should be used instead on the actual site. i < 3 is used for now on the template because
+            //the template only has 3 HTML timer divs to be accessed.
+
+            // ^^ if we make the loop length equal to the amount of halls we won't ever need to change the loop number
+            //    note: the .length function returns the length not including 0, so even though our array has 10 values
+            //          we actually started looping at 0 so we want to stop at 9, thus less than not less than or equal to
+
+            var hallDiv = document.getElementById(hallsArray[i][0]);
+
+            // check and make sure the hall is actually on our page first
+            if (hallDiv !== null) {
+              //now lets update our timers
+
+              var recentAlarmDate = new Date(hallsArray[i][1][0].date);
+
+              var totalSecs = parseInt((currentDate - recentAlarmDate) / 1000);
+
+              function pad ( val ) { return val > 9 ? val : "0" + val; }
+
+              totalSecs++;
+
+              hallDiv.getElementsByClassName("secs")[0].innerHTML = pad(totalSecs % 60);
+              hallDiv.getElementsByClassName("mins")[0].innerHTML =  pad(parseInt(totalSecs / 60 % 60));
+              hallDiv.getElementsByClassName("hours")[0].innerHTML = pad(parseInt(totalSecs / 3600 % 24));
+              hallDiv.getElementsByClassName("days")[0].innerHTML = pad(parseInt(totalSecs / 86400));
+            }
+
+          }
+        }, 1000);
 
       }
 
@@ -91,17 +137,34 @@
   <body>
     <div id="Hoge">
       <div class="timerBackground" style="background-image: url(https://pritchardalarms.com/wp-content/uploads/2021/07/hoge.jpg)">
-      <div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div>
+      <div class="imgDimmer"><div class="timerContainer imgTimer"><div id = "days" class="days">0</div><div id = "hours" class="hours">0</div><div id = "mins" class="mins">0</div><div id = "secs" class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div>
+      <h2>Hoge</h2>
+      <details>
+        <summary>Alarm Records</summary>
+        <p>08/23/22 - 9:58 PM</p>
+      </details>
     </div>
 
     <div id="Slusher">
       <div class="timerBackground" style="background-image: url(https://pritchardalarms.com/wp-content/uploads/2021/07/slusher.jpg)">
         <div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div>
+        <h2>Slusher</h2>
+        <details>
+          <summary>Alarm Records</summary>
+          <p></p>
+        </details>
     </div>
 
     <div id="CID">
       <div class="timerBackground" style="background-image: url(https://pritchardalarms.com/wp-content/uploads/2021/08/image.jpg)">
       <div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div>
+      <h2>The Creativity and Innovation District (CID)</h2>
+      <details>
+        <summary>Alarm Records</summary>
+        <p></p>
+      </details>
     </div>
+
+
   </body>
 </html>
