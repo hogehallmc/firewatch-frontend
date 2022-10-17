@@ -66,11 +66,6 @@
       #discordButton:hover {
         background-color: #5e5e5e;
       }
-      ul.twoColumns {
-        columns: 2;
-        -webkit-columns: 2;
-        -moz-columns: 2;
-      }
       ul.alarmRecords {
         list-style-type: none;
         padding: 0px;
@@ -108,13 +103,8 @@
 
           let currentDate = new Date();
 
+          // loop through all of the provided halls in our data pull
           for(let i = 0; i < hallsArray.length; i++){
-            //for(let i = 0; i < halls.length; i++){ //this commented code should be used instead on the actual site. i < 3 is used for now on the template because
-            //the template only has 3 HTML timer divs to be accessed.
-
-            // ^^ if we make the loop length equal to the amount of halls we won't ever need to change the loop number
-            //    note: the .length function returns the length not including 0, so even though our array has 10 values
-            //          we actually started looping at 0 so we want to stop at 9, thus less than not less than or equal to
 
             let hallDiv = document.getElementById(hallsArray[i][0]);
 
@@ -154,7 +144,7 @@
 
               //initial formatting code for the alarm dates in the hall
               let dateString = new Date(alarmsArray[i].date).toLocaleString('en-US', {
-                timeZone: 'America/New_York', year: '2-digit', month: '2-digit', day: '2-digit', hour: 'numeric', minute: '2-digit'
+                year: '2-digit', month: '2-digit', day: '2-digit', hour: 'numeric', minute: '2-digit'
               })
 
               //additional formatting code for the date string in <p>, adds the dash
@@ -163,11 +153,9 @@
               
               //connecting the textNode to the actual <p> element, then placing the <p> element in the hall HTML
               const textNode = document.createTextNode(dateString);
-
-              var newP;
               
               // output our alarm list
-              newP = document.createElement("li"); //new paragraph element to be added in details
+              let newP = document.createElement("li"); //new paragraph element to be added in details
               newP.appendChild(textNode);
               var detailsTag = hallDiv.getElementsByTagName("ul")[0];
               
@@ -190,9 +178,9 @@
     <div id="Pritchard">
       <div class="timerBackground" style="background-image: url(https://pritchardalarms.com/wp-content/uploads/2021/07/hoge.jpg)">
       <div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div>
-      <h2>Pritchard</h2>
-      <p class="summaryTag">Alarm Records</p>
-      <ul class="twoColumns">
+      <h2>Pritchard Hall</h2>
+      <p class="summaryTag" style="margin-bottom:0px;">Alarm Records:</p>
+      <ul class="alarmRecords" style="margin-top:1%;">
 
       </ul>
     </div>

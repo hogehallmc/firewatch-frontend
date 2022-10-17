@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        color: white;
+      }
+      h2 {
+        color: black;
+      }
+      details {
+        color: black;
+        padding-bottom: 5%;
+      }
+      p, ul, li {
+        color: black;
+      }
+      h1.entry-title {
+        margin-top: 40px;
+      }
+      p.alarmHistory {
+        white-space: pre-wrap;
+      }
+      .timerContainer {
+        font-size: 200%;
+        width: 100%;
+        display: inline-grid;
+        grid-template-columns: 25% 25% 25% 25%;
+        max-width: 400px;
+      }
+      .timerContainer > * {
+        justify-self: center;
+      }
+      .timerContainer > div:nth-of-type(1n+5) {
+        font-size: 40%;
+      }
+      .imgTimer {
+        font-size: 300%;
+        position: absolute;
+        height: 60%;
+        width: 95%;
+        top: 20%;
+        left: 2.5%;
+        margin: auto;
+      }
+      .imgDimmer {
+        position: relative;
+        background-color: rgba(0,0,0,0.6);
+        height: 100%;
+        width: 100%;
+        border-radius: inherit;
+      }
+      .timerBackground {
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        height: 225px;
+        max-width: 450px;
+        border-radius: 14px;
+        margin-bottom: 20px;
+      }
+      #discordButton {
+        background-color:#5865F2;
+        width:100%;
+      }
+      #discordButton:hover {
+        background-color: #5e5e5e;
+      }
+      ul.alarmRecords {
+        list-style-type: none;
+        padding: 0px;
+      }
+
+    </style>
+
+    <script>
+      async function grabAlarmData() {
+        let fetchHeaders = new Headers();
+        fetchHeaders.append('pragma', 'no-cache');
+        fetchHeaders.append('cache-control', 'no-cache');
+        var fetchInit = {
+          method: 'GET',
+          headers: fetchHeaders,
+        };
+        let alarmData = await fetch("https://pritchardalarms.com/alarmdata/data.json", fetchInit)
+          .then(res => res.text())
+          .then(rep => { return rep; })
+
+        return JSON.parse(alarmData);
+      };
+
+      async function init() {
+
+        let alarmData = await grabAlarmData();
+
+        // example code (when was the last time data was pulled from the spreadsheet?)
+        let lastDataPullTime = new Date(alarmData.lastUpdate);
+        console.log("Last data pull was on " + lastDataPullTime.toDateString() + " at " + lastDataPullTime.toLocaleTimeString() + ".");
+
+        let hallsArray = Object.entries(alarmData.halls);
+
+        setInterval( function(){
+
+          let currentDate = new Date();
+
+          // loop through all of the provided halls in our data pull
+          for(let i = 0; i < hallsArray.length; i++){
+
+            let hallDiv = document.getElementById(hallsArray[i][0]);
+
+            // check and make sure the hall is actually on our page first
+            if (hallDiv !== null && hallsArray[i][1][0]) {
+              //now lets update our timers
+
+              let recentAlarmDate = new Date(hallsArray[i][1][0].date);
+
+              let totalSecs = parseInt((currentDate - recentAlarmDate) / 1000);
+
+              function pad ( val ) { return val > 9 ? val : "0" + val; }
+
+              totalSecs++;
+
+              hallDiv.getElementsByClassName("secs")[0].innerHTML = pad(totalSecs % 60);
+              hallDiv.getElementsByClassName("mins")[0].innerHTML =  pad(parseInt(totalSecs / 60 % 60));
+              hallDiv.getElementsByClassName("hours")[0].innerHTML = pad(parseInt(totalSecs / 3600 % 24));
+              hallDiv.getElementsByClassName("days")[0].innerHTML = pad(parseInt(totalSecs / 86400));
+            }
+
+          }
+        }, 1000);
+
+        //looping through the overall list of all halls
+        for(let i = 0; i < hallsArray.length; i++){
+
+          let currentHall = hallsArray[i];
+          let hallDiv = document.getElementById(currentHall[0]);
+
+          if(hallDiv !== null){ //check to make sure the actual hall HTML element exists
+
+            let alarmsArray = currentHall[1];
+
+            //looping thorugh the list of alarms in the current individual hall
+            for(let i = 0; i < alarmsArray.length; i++){
+
+              //initial formatting code for the alarm dates in the hall
+              let dateString = new Date(alarmsArray[i].date).toLocaleString('en-US', {
+                year: '2-digit', month: '2-digit', day: '2-digit', hour: 'numeric', minute: '2-digit'
+              })
+
+              //additional formatting code for the date string in <p>, adds the dash
+              const splitString = dateString.split(", ");
+              dateString = splitString[0] + " - " + splitString[1];
+              
+              //connecting the textNode to the actual <p> element, then placing the <p> element in the hall HTML
+              const textNode = document.createTextNode(dateString);
+              
+              // output our alarm list
+              let newP = document.createElement("li"); //new paragraph element to be added in details
+              newP.appendChild(textNode);
+              var detailsTag = hallDiv.getElementsByTagName("ul")[0];
+              
+              detailsTag.appendChild(newP);
+            }
+          
+            //add the total alarm count in the summary tag, ex. (11)
+            var summaryTag = hallDiv.getElementsByClassName("summaryTag")[0];
+            summaryTag.innerHTML = summaryTag.innerHTML + " (" + currentHall[1].length + ")";
+
+          }
+        }       
+      }
+
+      init();
+
+    </script>
+  </head>
+  <body>
+
+    <div id="AJ"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/07/ambler.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Ambler Johnston</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Campbell"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/campbell.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Campbell</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Cochrane"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/09/cochrane.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Cochrane</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="CID"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/08/image.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>CID</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Eggleston"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/eggleston.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Eggleston</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="GLC"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/glc.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>GLC</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Harper"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/08/harper.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Harper</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Hillcrest"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/hillcrest.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Hillcrest</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Hoge"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/07/hoge.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Hoge</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Johnson"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/07/johnson.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Johnson</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Miles"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/miles.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Miles</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="New Hall West"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/newHallWest.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>New Residence Hall West</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="New Hall East"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/newHallEast.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>New Residence Hall East</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Newman"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/07/newman.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Newman</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="O Shag"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/07/oshag.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>O'Shaughnessy</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Payne"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/PayneHall.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Payne</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Pearson West"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/pearsonWest.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Pearson West</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Pearson East"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/pearsonEast.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Pearson East</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Peddrew-Yates"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/peddrewyates.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Peddrew-Yates</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Pritchard"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/07/pritchard.png)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Pritchard</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Slusher"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/07/slusher.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Slusher</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Vawter"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2021/08/vawter2.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Vawter</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+    <div id="Whitehurst"><div class="timerBackground" style="background-image: url(https://vtfirewatch.com/wp-content/uploads/2022/10/whitehurst.jpg)"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>Whitehurst</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details></div>
+
+  </body>
+</html>
