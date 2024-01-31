@@ -26,26 +26,26 @@ async function grabAlarmData() {
 
 
 // ------------------------------ html editing ------------------------------
-function createHallElement(hallID, hallName, hallImg) {
+function createHallElement(hallID, hallName, hallImg, imgCredit) {
   let hallElement = document.createElement('div');
   hallElement.id = hallID;
   hallElement.classList.add("hallElement");
-  hallElement.innerHTML = '<div class="timerBackground" style="background-image: url(' + hallImg + ')"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>' + hallName + '</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details>';
+  hallElement.innerHTML = '<div class="timerBackground" style="background-image: url(' + hallImg + ')"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div><div class="imgCredit">' + imgCredit + '</div></div></div><h2>' + hallName + '</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details>';
   document.getElementById("hallTimerContainer").appendChild(hallElement);
 };
 
-function createFeaturedHall(hallID, hallName, hallImg) {
+function createFeaturedHall(hallID, hallName, hallImg, imgCredit) {
   let hallElement = document.createElement('div');
   hallElement.id = hallID;
   hallElement.classList.add("featuredElement");
-  hallElement.innerHTML = '<div class="timerBackground" style="background-image: url(' + hallImg + ')"><div class="imgDimmer"><h2>' + hallName + '</h2><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details>';
+  hallElement.innerHTML = '<div class="timerBackground" style="background-image: url(' + hallImg + ')"><div class="imgDimmer"><h2>' + hallName + '</h2><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div><div class="imgCredit">' + imgCredit + '</div></div></div><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details>';
   document.getElementById("featuredHallContainer").appendChild(hallElement);
 }
 
 function createAllNonFeaturedElements(hallsArray, featuredHallId) {
   for (let i = 0; i < hallsArray.length; i++) {
     if (hallsArray[i].id !== featuredHallId) {
-      createHallElement(hallsArray[i].id, hallsArray[i].name, hallsArray[i].img);
+      createHallElement(hallsArray[i].id, hallsArray[i].name, hallsArray[i].img, hallsArray[i].imgCredit);
     }
   }
 }
@@ -54,10 +54,17 @@ function createAllNonFeaturedElements(hallsArray, featuredHallId) {
 
 // ------------------------------ data handeling ------------------------------
 class hall {
-  constructor(hallId, hallName, hallImg, alarmRecords) {
+  constructor(hallId, hallName, hallImg, imgCredit, alarmRecords) {
+    if (imgCredit === null) {
+      imgCredit = "";
+    } else {
+      imgCredit = "Photo by " + imgCredit;
+    }
+
     this.id = hallId;
     this.name = hallName;
     this.img = hallImg;
+    this.imgCredit = imgCredit;
     this.alarms = alarmRecords;
     this.mostRecent = alarmRecords[0];
   }
@@ -82,7 +89,7 @@ function convertToListOfHallClasses(alarmData, hallRes) {
   for (let hallIndex = 0; hallIndex < hallKeys.length; hallIndex++) {
     let currentHallId = hallKeys[hallIndex]
 
-    let hallObj = new hall(currentHallId, hallRes[currentHallId].name, hallRes[currentHallId].img, alarmData.halls[hallKeys[hallIndex]]);
+    let hallObj = new hall(currentHallId, hallRes[currentHallId].name, hallRes[currentHallId].img, hallRes[currentHallId].imgCredit, alarmData.halls[hallKeys[hallIndex]]);
     hallsArray.push(hallObj)
   }
 
@@ -236,7 +243,7 @@ async function init() {
   // ok now that we are ticking lets create our hall timers
   // first we need to calculate which hall has the most records for this semester
   let featuredHall = hallsArray[getHallWithMostAlarms(hallsArray)];
-  createFeaturedHall(featuredHall.id, featuredHall.name, featuredHall.img);
+  createFeaturedHall(featuredHall.id, featuredHall.name, featuredHall.img, featuredHall.imgCredit);
 
   
   // lets put our halls in order of how recent they are
@@ -364,4 +371,3 @@ async function init() {
 
 // -------------- lets start the show --------------
 init();
-
