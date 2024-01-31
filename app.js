@@ -30,7 +30,7 @@ function createHallElement(hallID, hallName, hallImg) {
   let hallElement = document.createElement('div');
   hallElement.id = hallID;
   hallElement.classList.add("hallElement");
-  hallElement.innerHTML = '<div class="timerBackground" style="background-image: url(https://vtfirewatch.com' + hallImg + ')"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>' + hallName + '</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details>';
+  hallElement.innerHTML = '<div class="timerBackground" style="background-image: url(' + hallImg + ')"><div class="imgDimmer"><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><h2>' + hallName + '</h2><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details>';
   document.getElementById("hallTimerContainer").appendChild(hallElement);
 };
 
@@ -38,7 +38,7 @@ function createFeaturedHall(hallID, hallName, hallImg) {
   let hallElement = document.createElement('div');
   hallElement.id = hallID;
   hallElement.classList.add("featuredElement");
-  hallElement.innerHTML = '<div class="timerBackground" style="background-image: url(https://vtfirewatch.com' + hallImg + ')"><div class="imgDimmer"><h2>' + hallName + '</h2><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details>';
+  hallElement.innerHTML = '<div class="timerBackground" style="background-image: url(' + hallImg + ')"><div class="imgDimmer"><h2>' + hallName + '</h2><div class="timerContainer imgTimer"><div class="days">0</div><div class="hours">0</div><div class="mins">0</div><div class="secs">0</div><div>days</div><div>hrs</div><div>mins</div><div>secs</div></div></div></div><details><summary class="summaryTag">Alarm Records</summary><ul class="alarmRecords"></ul></details>';
   document.getElementById("featuredHallContainer").appendChild(hallElement);
 }
 
@@ -152,15 +152,17 @@ function startTimerUpdateLoop(hallsArray) {
   let timerArray = []
 
   for (let hallIndex = 0; hallIndex < hallsArray.length; hallIndex++) {
-    //timerArray.push([hallsArray[hallIndex].id, hallsArray[hallIndex].mostRecent]);
+    timerArray.push([hallsArray[hallIndex].id, hallsArray[hallIndex].mostRecent]);
     
     // to show alarms no matter the semester uncomment out the above line and comment out the
     // following if statement
+    /*
     if (hallsArray[hallIndex].currentSemesterRecords().length > 0) {
       timerArray.push([hallsArray[hallIndex].id, hallsArray[hallIndex].mostRecent]);
     } else {
       timerArray.push([hallsArray[hallIndex].id, false]);
     }
+    */
   }
 
   var refreshAlarmCounters = setInterval( function(){
